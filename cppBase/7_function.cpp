@@ -125,6 +125,12 @@ int josephus(int n) {
     while (pre->next != pre) {
         // 每2个人淘汰一个 -》 移动1位，找到要删除的节点
         pre = pre->next;
+        /**
+         * 每k人，移动k-1次
+         * for (int i = 1; i < k; ++i) {
+         *      pre = pre->next;
+         * }
+         */
         delNode = pre->next;
         pre->next = delNode->next;
         cout << "delete node number :" << delNode->number << endl;
