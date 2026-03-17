@@ -1,2 +1,2 @@
 # my-first-project
-一些杂乱的东西
+![Snipaste_2026-03-17_23-21-22](./photo/Snipaste_2026-03-17_23-21-22.png)
