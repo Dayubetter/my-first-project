@@ -104,12 +104,54 @@ void midAdd() {
     printDoublyLinkedList(head);
 }
 
-// 删除 TODO
+// 删除
+void midRemove() {
+    DoublyListNode* head = createDoublyLinkedList({1,2,3,4,5});
+    // 删除第4个节点
+    // 需要找到第3个节点
+    DoublyListNode* cur = head;
+    for (int i = 0 ; i < 2; i++) {
+        cur = cur->next;
+    }
+    // 当前指针指向第三个节点，把后面删除
+    DoublyListNode* toDelete = cur->next;
+    cur->next = toDelete->next;
+    toDelete->next->prev = toDelete->prev;
+    //
+    toDelete->next = nullptr;
+    toDelete->prev = nullptr;
+    printDoublyLinkedList(head);
+}
 
+void headRemove() {
+    DoublyListNode* head = createDoublyLinkedList({1,2,3,4,5});
+
+    DoublyListNode* toDelete = head;
+    head = head->next;
+    head->prev = nullptr;
+
+    toDelete->next = nullptr;
+    printDoublyLinkedList(head);
+}
+
+void lastRemove() {
+    DoublyListNode* head = createDoublyLinkedList({1,2,3,4,5});
+    DoublyListNode* cur = head;
+    while (cur->next != nullptr) {
+        cur = cur->next;
+    }
+    cur->prev->next = nullptr;
+    // 被删节点前后最好都断开
+    cur->prev = nullptr;
+    printDoublyLinkedList(head);
+}
 int main() {
     searchDoublyLinkedList();
     headAdd();
     lastAdd();
     midAdd();
+    midRemove();
+    headRemove();
+    lastRemove();
     return 0;
 }
