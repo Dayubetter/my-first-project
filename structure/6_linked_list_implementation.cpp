@@ -2,6 +2,8 @@
 // Created by dayub on 2026/3/18.
 //
 #include <iostream>
+#include <string>
+#include <stdexcept>
 using namespace std;
 
 // 关键点一、同时持有头尾节点的引用，尾部添加就可以O(1)
@@ -17,7 +19,9 @@ class MyLinkedList {
         Node* next;
         Node* prev;
 
-        Node(E value) : val(value), next(nullptr), prev(nullptr) {}
+        Node(E value) : val(value), next(nullptr), prev(nullptr) {
+            cout<<"Node(){}"<<endl;
+        }
     };
     // 虚拟头尾节点
     Node* head;
@@ -32,6 +36,7 @@ public:
         head->next = tail;
         tail->prev = head;
         size = 0;
+        cout<<"MyLinkedList(){}"<<endl;
     }
 
     ~MyLinkedList() {
@@ -40,31 +45,146 @@ public:
         }
         delete head;
         delete tail;
+        cout<<"MyLinkedList()~"<<endl;
     }
 
     // ****** 增 *****
-    void addLast(E e) {}
+    void addLast(E e) {
+        Node* newNode = new Node(e);
+        Node* temp = tail->prev;
 
-    void addFirst(E e) {}
+        temp->next = newNode;
+        newNode->prev = temp;
+        // temp <-> newNode
 
-    void add(int index, E e) {}
+        newNode->next = tail;
+        tail->prev = newNode;
+        // temp <-> newNode <-> tail
+        size++;
+    }
+
+    void addFirst(E e) {
+        Node* newNode = new Node(e);
+        Node* temp = head->next;
+        // head <-> temp
+        temp->prev = newNode;
+        newNode->next = temp;
+        // newNode <-> temp
+
+        head->next = newNode;
+        newNode->prev = head;
+        // head <-> newNode <-> temp
+        size++;
+    }
+
+    void add(int index, E e) {
+        checkPositionIndex(index);
+        if (index == size) {
+            addLast(e);
+            return;
+        }
+        // 找到index对应的Node
+        Node* cur = getNode(index);
+        Node* temp = cur->prev;
+        // temp <-> cur
+
+        // 新要插入的Node
+        Node* newNode = new Node(e);
+        temp->next = newNode;
+        newNode->prev = temp;
+        // temp <-> newNode
+
+        newNode->next = cur;
+        cur->prev = newNode;
+        // temp <-> newNode <-> cur
+        size++;
+    }
 
     // ***** 删 *****
-    E removeFirst() {}
+    E removeFirst() {
+        if (size < 1) {
+            throw out_of_range("List is empty");
+        }
+        // 虚拟节点的存在是我们不用考虑空指针的问题
+        Node* toDelete = head->next;
+        Node* temp = toDelete->next;
+        // head <-> toDelete <-> temp
+        head->next = temp;
+        temp->prev = head;
 
-    E removeLast() {}
+        E val = toDelete->val;
+        delete toDelete;
+        // head <-> temp
+        size--;
+        return val;
+    }
 
-    E remove(int index) {}
+    E removeLast() {
+        if (size < 1) {
+            throw out_of_range("List is empty");
+        }
+        Node* toDelete = tail->prev;
+        Node* temp = toDelete->prev;
+        // temp <-> toDelete <-> tail
+        temp->next = tail;
+        tail->prev = temp;
+        // temp <-> tail
+        E val = toDelete->val;
+        toDelete->prev = nullptr;
+        toDelete->next = nullptr;
+        delete toDelete;
+        // temp <-> tail
+        size--;
+        return val;
+    }
+
+    E remove(int index) {
+        checkElementIndex(index);
+        // 找到index 对应的Node
+        Node* toDelete = getNode(index);
+        Node* prev = toDelete->prev;
+        Node* next = toDelete->next;
+        // prev <-> toDelete <-> next
+        prev->next = next;
+        next->prev = prev;
+        E val = toDelete->val;
+        toDelete->prev = nullptr;
+        toDelete->next = nullptr;
+        delete toDelete;
+        // prev <-> next
+        size--;
+        return val;
+    }
 
     // ***** 查 *****
-    E get(int index) {}
+    E get(int index) {
+        checkElementIndex(index);
+        Node* toGet = getNode(index);
+        return toGet->val;
+    }
 
-    E getFirst() {}
+    E getFirst() {
+        if (size < 1) {
+            throw out_of_range("List is empty");
+        }
+        return head->next->val;
+    }
 
-    E getLast() {}
+    E getLast() {
+        if (size < 1) {
+            throw out_of_range("List is empty");
+        }
+        return tail->prev->val;
+    }
 
     // ***** 改 *****
-    E set(int index, E val) {}
+    E set(int index, E val) {
+        checkElementIndex(index);
+        Node* toSet = getNode(index);
+        E oldVal = toSet->val;
+        toSet->val = val;
+        return oldVal;
+    }
 
     // **** 工具函数 ****
     int getSize() const {
@@ -119,7 +239,28 @@ private:
 
 int main() {
     MyLinkedList<int> list;
+    list.addLast(10);
+    list.addLast(20);
+    list.addLast(30);
+    list.addFirst(0);
+    list.add(3,33);
     list.display();
+    list.removeFirst();
+    list.display();
+    list.removeLast();
+    list.display();
+    list.remove(1);
+    list.display();
+    int first = list.getFirst();
+    int last = list.getLast();
+    int index0 = list.get(0);
+    int index1 = list.get(1);
+    cout << first << last << index0 << index1 << endl;
+    cout<<"========"<<endl;
+    list.set(0,11);
+    list.display();
+    int index99 = list.get(99);
+    cout << index99 << endl;
     cout << list.getSize() << endl;
     cout << list.isEmpty() << endl;
     return 0;
